@@ -59,6 +59,10 @@ namespace NotesApp.Controllers
         [HttpPost]
         public async Task<IActionResult> Edit(Guid id, NotesInputModel model)
         {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
             await _notesManager.Edit(id, model);
             return RedirectToAction(nameof(Index));
         }
