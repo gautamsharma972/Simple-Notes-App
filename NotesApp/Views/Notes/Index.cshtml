@@ -1,0 +1,80 @@
+﻿@model IEnumerable<NotesViewModel>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div>
+    <h5>
+        Notes
+        <a asp-action="Edit" asp-controller="Notes" class="float-right btn btn-primary">Create New</a>
+    </h5>
+    <p class="text-muted">Click on the Title to view full details</p>
+    <hr />
+    @{
+        int count = 1;
+    }
+    @if (Model.Count() > 0)
+    {
+        <ul class="list-group">
+
+            @foreach (var item in Model.OrderByDescending(a => a.CreatedOn))
+            {
+                <li class="list-group-item">
+                    <p>
+                        <span class="h6">@count.</span> <a class="text-dark h6" asp-action="Details" asp-controller="Notes" asp-route-id="@item.Id">@item.Title</a>
+                        <br />
+                        <small class="text-muted">Created on @item.CreatedOn.ToShortDateString()</small>
+                        <span class="float-right">
+                            <a asp-action="Edit" asp-controller="Notes" asp-route-id="@item.Id">Edit</a> | 
+                            <a href="javascript:void(0);" data-id="@item.Id" data-title="@item.Title" class="text-danger deleteNote" data-toggle="modal" data-target="#deleteModal">
+                                Delete
+                            </a>
+                        </span>
+                    </p>
+                </li>
+                count++;
+            }
+        </ul>
+    }
+    else
+    {
+        <p>No notes have been created yet. <a asp-action="Edit" asp-controller="Notes">Click here</a> to create one!</p>
+    }
+
+
+</div>
+
+<div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Sure to Delete?</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                Are you sure to delete - <span id="notetitle"></span>
+            </div>
+            <div class="modal-footer">
+                <form asp-action="Delete" asp-controller="Notes" method="post">
+                    <input type="hidden" id="noteId" name="Id" />
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script type="text/javascript">
+        $(document).on("click", ".deleteNote", function () {
+            var noteId = $(this).data('id');
+            var noteTitle = $(this).data('title');
+            $(".modal-body #notetitle").html(noteTitle);
+            $('#noteId').val(noteId);
+        });
+    </script>
+}
